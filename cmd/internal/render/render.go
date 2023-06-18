@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/beginoffile/bookings/pkg/config"
-	"github.com/beginoffile/bookings/pkg/models"
+	"github.com/beginoffile/bookings/cmd/internal/config"
+	"github.com/beginoffile/bookings/cmd/internal/models"
+	"github.com/justinas/nosurf"
 )
 
 // func RenderTemplate(w http.ResponseWriter, tmpl string) {
@@ -83,12 +84,14 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+
+	td.CSRFToken = nosurf.Token(r)
 
 	return td
 }
 
-func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
 
 	var tc map[string]*template.Template
 	// Create a template cache
@@ -108,7 +111,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData)
 
 	buf := new(bytes.Buffer)
 
-	td = AddDefaultData(td)
+	td = AddDefaultData(td, r)
 
 	err := t.Execute(buf, td)
 	if err != nil {
@@ -137,7 +140,9 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 
 	// range through all files ending with *.page.tmpl
 	for _, page := range pages {
+
 		name := filepath.Base(page)
+
 		ts, err := template.New(name).ParseFiles(page)
 
 		if err != nil {
