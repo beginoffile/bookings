@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/beginoffile/bookings/cmd/internal/config"
 	"github.com/beginoffile/bookings/cmd/internal/handlers"
+	"github.com/beginoffile/bookings/cmd/internal/models"
 	"github.com/beginoffile/bookings/cmd/internal/render"
 )
 
@@ -22,6 +24,9 @@ func AddValue(x, y int) int {
 }
 
 func main() {
+
+	//What am I going to put in the session
+	gob.Register(models.Reservation{})
 
 	app.InProduction = false
 
