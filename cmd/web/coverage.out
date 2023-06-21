@@ -1,0 +1,11 @@
+mode: set
+github.com/beginoffile/bookings/cmd/web/main.go:22.29,24.2 1 0
+github.com/beginoffile/bookings/cmd/web/main.go:26.13,30.16 2 0
+github.com/beginoffile/bookings/cmd/web/main.go:30.16,33.3 1 0
+github.com/beginoffile/bookings/cmd/web/main.go:42.2,50.16 4 0
+github.com/beginoffile/bookings/cmd/web/main.go:54.18,70.16 10 1
+github.com/beginoffile/bookings/cmd/web/main.go:70.16,72.3 1 0
+github.com/beginoffile/bookings/cmd/web/main.go:74.2,83.12 6 1
+github.com/beginoffile/bookings/cmd/web/middleware.go:17.45,26.2 3 1
+github.com/beginoffile/bookings/cmd/web/middleware.go:29.50,31.2 1 1
+github.com/beginoffile/bookings/cmd/web/routes.go:12.49,44.2 18 1

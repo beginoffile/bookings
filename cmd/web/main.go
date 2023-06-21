@@ -25,6 +25,34 @@ func AddValue(x, y int) int {
 
 func main() {
 
+	err := run()
+
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+	// http.HandleFunc("/", handlers.Repo.Home)
+	// http.HandleFunc("/about", handlers.Repo.About)
+
+	// fmt.Println(fmt.Sprintf("Staring application on port %s", portNumber))
+
+	// http.ListenAndServe(portNumber, nil)
+
+	fmt.Println(fmt.Sprintf("Staring application on port %s", portNumber))
+
+	srv := &http.Server{
+		Addr:    portNumber,
+		Handler: routes(&app),
+	}
+
+	err = srv.ListenAndServe()
+	log.Fatal(err)
+
+}
+
+func run() error {
+
 	//What am I going to put in the session
 	gob.Register(models.Reservation{})
 
@@ -52,21 +80,6 @@ func main() {
 
 	render.NewTemplates(&app)
 
-	// http.HandleFunc("/", handlers.Repo.Home)
-	// http.HandleFunc("/about", handlers.Repo.About)
-
-	// fmt.Println(fmt.Sprintf("Staring application on port %s", portNumber))
-
-	// http.ListenAndServe(portNumber, nil)
-
-	srv := &http.Server{
-		Addr:    portNumber,
-		Handler: routes(&app),
-	}
-
-	err = srv.ListenAndServe()
-	log.Fatal(err)
-
-	fmt.Println(fmt.Sprintf("Staring application on port %s", portNumber))
+	return nil
 
 }
