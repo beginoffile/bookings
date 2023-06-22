@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"encoding/gob"
+	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -17,6 +20,8 @@ import (
 
 var app config.AppConfig
 var session *scs.SessionManager
+var pathToTemplates = "./../../../templates"
+var functions = template.FuncMap{}
 
 func getRoutes() http.Handler {
 	//What am I going to put in the session
@@ -29,16 +34,17 @@ func getRoutes() http.Handler {
 	session.Cookie.Persist = true
 	session.Cookie.SameSite = http.SameSiteLaxMode
 	session.Cookie.Secure = app.InProduction
+
 	app.Session = session
 
-	tc, err := render.CreateTemplateCache()
+	tc, err := CreateTestTemplateCache()
 
 	if err != nil {
 		log.Fatal("Cannot create template cache")
 	}
 
 	app.TemplateCache = tc
-	app.UseCache = false
+	app.UseCache = true
 
 	repo := NewRepo(&app)
 
@@ -50,7 +56,7 @@ func getRoutes() http.Handler {
 
 	mux.Use(middleware.Recoverer)
 	// mux.Use(WriteToConsol)
-	mux.Use(NoSurf)
+	// mux.Use(NoSurf)
 	mux.Use(SessionLoad)
 
 	mux.Get("/", Repo.Home)
@@ -89,4 +95,47 @@ func NoSurf(next http.Handler) http.Handler {
 // SesionLoad Loads and saves the session on every request...
 func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
+}
+
+func CreateTestTemplateCache() (map[string]*template.Template, error) {
+	// myCache := make(map[string] *template.Template)
+
+	myCache := map[string]*template.Template{}
+
+	// get all of the files name *page.tmpl from ./templates
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*page.tmpl", pathToTemplates))
+
+	if err != nil {
+		return myCache, err
+	}
+
+	// range through all files ending with *.page.tmpl
+	for _, page := range pages {
+
+		name := filepath.Base(page)
+
+		ts, err := template.New(name).ParseFiles(page)
+
+		if err != nil {
+			return myCache, err
+		}
+
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*layout.tmpl", pathToTemplates))
+		if err != nil {
+			return myCache, err
+		}
+
+		if len(matches) > 0 {
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*layout.tmpl", pathToTemplates))
+			if err != nil {
+				return myCache, err
+			}
+
+		}
+
+		myCache[name] = ts
+	}
+
+	return myCache, nil
+
 }
