@@ -10,6 +10,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/beginoffile/bookings/cmd/internal/config"
+	"github.com/beginoffile/bookings/cmd/internal/driver"
 	"github.com/beginoffile/bookings/cmd/internal/handlers"
 	"github.com/beginoffile/bookings/cmd/internal/helpers"
 	"github.com/beginoffile/bookings/cmd/internal/models"
@@ -29,12 +30,14 @@ func AddValue(x, y int) int {
 
 func main() {
 
-	err := run()
+	db, err := run()
 
 	if err != nil {
 		log.Fatal(err)
 
 	}
+
+	defer db.SQL.Close()
 
 	// http.HandleFunc("/", handlers.Repo.Home)
 	// http.HandleFunc("/about", handlers.Repo.About)
@@ -55,10 +58,13 @@ func main() {
 
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 
 	//What am I going to put in the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
 
 	app.InProduction = false
 
@@ -75,23 +81,34 @@ func run() error {
 	session.Cookie.Secure = app.InProduction
 	app.Session = session
 
+	// connect to database
+	log.Println("Connecting to database...")
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=postgres password=12345678")
+
+	if err != nil {
+		log.Fatal("Cannot connect to database! Dying...")
+	}
+
+	// defer db.SQL.Close()
+
 	tc, err := render.CreateTemplateCache()
 
 	if err != nil {
 		log.Fatal("Cannot create template cache")
+		return nil, err
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 
 	handlers.NewHandlers(repo)
 
-	render.NewTemplates(&app)
+	render.NewRenderer(&app)
 
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 
 }
