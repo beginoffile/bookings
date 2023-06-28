@@ -104,8 +104,13 @@ func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *models.Te
 	// tc, err := CreateTemplateCache()
 	if app.UseCache {
 		tc = app.TemplateCache
+
 	} else {
-		tc, _ = CreateTemplateCache()
+		var err error
+		tc, err = CreateTemplateCache()
+		if err != nil {
+			return err
+		}
 	}
 
 	// get request template from cache
