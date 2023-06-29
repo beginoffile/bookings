@@ -2,6 +2,7 @@ package dbrepo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -131,5 +132,35 @@ func (m *postgressDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([
 	}
 
 	return rooms, nil
+
+}
+
+// GetRoomByID gets a room by id
+func (m *postgressDBRepo) GetRoomByID(id int) (models.Room, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+	defer cancel()
+
+	var room models.Room
+
+	query := `
+	Select t1.id, t1.room_name, t1.created_at, t1.updated_at
+	From Room t1
+	Where t1.id = $1
+	`
+
+	err := m.DB.QueryRowContext(ctx, query, id).Scan(
+		&room.ID,
+		&room.RoomName,
+		&room.CreateAt,
+		&room.UpdateAt,
+	)
+
+	if err != nil {
+		return room, errors.New("[GetRoomByID.QueryRowContext]" + err.Error())
+	}
+
+	return room, nil
 
 }

@@ -16,4 +16,6 @@ type DatabaseRepo interface {
 	SearchAvailabilityByDatesByRoomID(start, end time.Time, RoomID int) (bool, error)
 
 	SearchAvailabilityForAllRooms(start, end time.Time) ([]models.Room, error)
+
+	GetRoomByID(id int) (models.Room, error)
 }
