@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/beginoffile/bookings/cmd/internal/config"
-	"github.com/beginoffile/bookings/cmd/internal/driver"
-	"github.com/beginoffile/bookings/cmd/internal/handlers"
-	"github.com/beginoffile/bookings/cmd/internal/helpers"
-	"github.com/beginoffile/bookings/cmd/internal/models"
-	"github.com/beginoffile/bookings/cmd/internal/render"
+	"github.com/beginoffile/bookings/internal/config"
+	"github.com/beginoffile/bookings/internal/driver"
+	"github.com/beginoffile/bookings/internal/handlers"
+	"github.com/beginoffile/bookings/internal/helpers"
+	"github.com/beginoffile/bookings/internal/models"
+	"github.com/beginoffile/bookings/internal/render"
 )
 
 const portNumber = ":8080"
@@ -38,6 +38,30 @@ func main() {
 	}
 
 	defer db.SQL.Close()
+
+	defer close(app.MailChan)
+
+	fmt.Println("Starting mail Listener...")
+
+	listenForMail()
+
+	// msg := models.MailData{
+	// 	To:      "john@do.lat",
+	// 	From:    "me@here.com",
+	// 	Subject: "Hola",
+	// 	Content: "",
+	// }
+
+	// app.MailChan <- msg
+
+	// from := "me@here.com"
+
+	// auth := smtp.PlainAuth("", from, "", "localhost")
+
+	// err = smtp.SendMail("localhost:1025", auth, from, []string{"you@here.com"}, []byte("Hello World"))
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 
 	// http.HandleFunc("/", handlers.Repo.Home)
 	// http.HandleFunc("/about", handlers.Repo.About)
@@ -65,6 +89,10 @@ func run() (*driver.DB, error) {
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
+
+	mailChan := make(chan models.MailData)
+
+	app.MailChan = mailChan
 
 	app.InProduction = false
 
