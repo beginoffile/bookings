@@ -174,7 +174,7 @@ func (m *postgressDBRepo) GetUserByID(id int) (models.User, error) {
 	defer cancel()
 
 	query := `Select id, first_name, last_name, email, password, access_level, created_at, update_at
-	from user
+	from public.user
 	Where id = $1`
 
 	var u models.User
@@ -196,7 +196,7 @@ func (m *postgressDBRepo) UpdateUser(u models.User) error {
 
 	defer cancel()
 
-	query := `Update User 
+	query := `Update public.user 
 	Set first_name = $1, 
 		last_name = $2, 
 		email= $3, 		
@@ -223,7 +223,7 @@ func (m *postgressDBRepo) Authenticate(email, testPassword string) (int, string,
 	var id int
 	var hashedPassword string
 
-	query := `Select id, password from user Where email = $1`
+	query := `Select id, password from public.user Where email = $1`
 
 	err := m.DB.QueryRowContext(ctx, query, email).Scan(&id, &hashedPassword)
 
