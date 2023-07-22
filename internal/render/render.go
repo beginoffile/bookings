@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/beginoffile/bookings/internal/config"
 	"github.com/beginoffile/bookings/internal/models"
@@ -77,7 +78,9 @@ import (
 // 	return nil
 // }
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate": HumanDate,
+}
 
 var app *config.AppConfig
 var pathToTemplate = "./templates"
@@ -85,6 +88,11 @@ var pathToTemplate = "./templates"
 // NewRenderer set the config for the template package
 func NewRenderer(a *config.AppConfig) {
 	app = a
+}
+
+// HumanDate returns time in YYYY-MM-DD format
+func HumanDate(t time.Time) string {
+	return t.Format("2006-01-02")
 }
 
 func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
@@ -161,7 +169,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 
 		name := filepath.Base(page)
 
-		ts, err := template.New(name).ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 
 		if err != nil {
 			return myCache, err
