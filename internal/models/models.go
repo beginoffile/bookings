@@ -45,6 +45,7 @@ type Reservation struct {
 	CreateAt  time.Time
 	UpdateAt  time.Time
 	Room      Room
+	Processed int
 }
 
 // RoomRestriction is the room restriction model
