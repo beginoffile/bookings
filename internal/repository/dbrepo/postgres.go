@@ -430,7 +430,7 @@ func (m *postgressDBRepo) DeleteReservation(id int) error {
 
 	defer cancel()
 
-	query := `Delete reservation	
+	query := `Delete from reservation	
 	Where id = $1`
 
 	_, err := m.DB.ExecContext(ctx, query, id)
