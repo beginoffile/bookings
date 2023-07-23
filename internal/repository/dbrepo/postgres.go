@@ -463,3 +463,47 @@ func (m *postgressDBRepo) UpdateProcessedForReservation(id, processed int) error
 	return nil
 
 }
+
+// AllRooms Get all rooms
+func (m *postgressDBRepo) AllRooms() ([]models.Room, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+	defer cancel()
+
+	var rooms []models.Room
+
+	query := `select t1.id, t1.room_name, t1.created_at, t1.updated_at
+	from room t1	
+	order by t1.room_name
+		`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+
+	if err != nil {
+		return rooms, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var rm models.Room
+		err := rows.Scan(
+			&rm.ID,
+			&rm.RoomName,
+			&rm.CreateAt,
+			&rm.UpdateAt,
+		)
+
+		if err != nil {
+			return rooms, err
+		}
+
+		rooms = append(rooms, rm)
+	}
+
+	if err = rows.Err(); err != nil {
+		return rooms, err
+	}
+
+	return rooms, nil
+
+}
