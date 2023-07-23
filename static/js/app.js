@@ -82,12 +82,12 @@ function Prompt(){
 
                 }
             },
-            preConfirm: () => {
-                return [
-                document.getElementById('start').value,
-                document.getElementById('end').value
-                ]
-            },
+            // preConfirm: () => {
+            //     return [
+            //     document.getElementById('start').value,
+            //     document.getElementById('end').value
+            //     ]
+            // },
             didOpen: ()=>{
                 if (c.didOpen !== undefined){
                     c.didOpen();
@@ -101,7 +101,7 @@ function Prompt(){
             // }
             if (result){
                 if (result.dismiss != Swal.DismissReason.cancel){
-                    if (result.value == ""){
+                    if (result.value !== ""){
                         if (c.callback !== undefined){
                             c.callback(result);
                         }
