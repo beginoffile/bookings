@@ -507,3 +507,52 @@ func (m *postgressDBRepo) AllRooms() ([]models.Room, error) {
 	return rooms, nil
 
 }
+
+// GetRestrictionsForRoomByDate	returns restrictions for a room by date range
+func (m *postgressDBRepo) GetRestrictionsForRoomByDate(roomID int, start, end time.Time) ([]models.RoomRestriction, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+	defer cancel()
+
+	var restrictions []models.RoomRestriction
+
+	query := `select t1.id, coalesce(t1.reservation_id,0), t1.restriction_id, t1.room_id, t1.start_date, t1.end_date
+	from room_restriction t1	
+	Where t1.end_date > $1
+	 And t1.start_date <= $2
+	 And t1.room_id = $3	
+		`
+
+	rows, err := m.DB.QueryContext(ctx, query, start, end, roomID)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var rr models.RoomRestriction
+		err := rows.Scan(
+			&rr.ID,
+			&rr.ReservationID,
+			&rr.RestrictionID,
+			&rr.RoomID,
+			&rr.StartDate,
+			&rr.EndDate,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		restrictions = append(restrictions, rr)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return restrictions, nil
+
+}
