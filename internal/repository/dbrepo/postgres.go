@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/beginoffile/bookings/internal/models"
@@ -554,5 +555,51 @@ func (m *postgressDBRepo) GetRestrictionsForRoomByDate(roomID int, start, end ti
 	}
 
 	return restrictions, nil
+
+}
+
+// InsertBlockForRoom inserts a room restriction
+func (m *postgressDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+	defer cancel()
+
+	query := `Insert into room_restriction
+	(start_date, end_date, room_id, restriction_id, created_at, updated_at)
+	values
+	($1, $2, $3, $4, $5, $6)
+	`
+
+	_, err := m.DB.ExecContext(ctx, query, startDate, startDate.AddDate(0, 0, 1), id, 2, time.Now(), time.Now())
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+
+}
+
+// DeleteBlockForRoom deletes a room restriction
+func (m *postgressDBRepo) DeleteBlockByID(id int) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+	defer cancel()
+
+	query := `Delete from room_restriction
+	Where id = $1
+	`
+
+	_, err := m.DB.ExecContext(ctx, query, id)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
 
 }
