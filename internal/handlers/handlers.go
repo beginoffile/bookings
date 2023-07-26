@@ -86,7 +86,7 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 		// helpers.ServerError(w, errors.New("cannot get reservation from session"))
 		// return
 		m.App.Session.Put(r.Context(), "error", "can't get reservation from session")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -96,7 +96,7 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 		// helpers.ServerError(w, err)
 		// return
 		m.App.Session.Put(r.Context(), "error", err)
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -142,7 +142,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 			return
 		*/
 		m.App.Session.Put(r.Context(), "error", "can't pass form")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -207,7 +207,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 			helpers.ServerError(w, err)
 		*/
 		m.App.Session.Put(r.Context(), "error", "can't insert resertation into database")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -227,7 +227,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 			helpers.ServerError(w, err)
 		*/
 		m.App.Session.Put(r.Context(), "error", "can't insert room restriction!")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -420,7 +420,7 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 		// log.Println("Cannot get item from session")
 		m.App.ErrorLog.Println("Can't get reservation from session")
 		m.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
