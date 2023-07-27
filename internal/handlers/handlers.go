@@ -146,18 +146,13 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// sd := r.Form.Get("start_date")
-	// ed := r.Form.Get("end_date")
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
 
-	// startDate, err := time.Parse("2006-01-02", sd)
-	// if err != nil {
-	// 	helpers.ServerError(w, err)
-	// }
+	stringMap := make(map[string]string)
 
-	// endDate, err := time.Parse("2006-01-02", ed)
-	// if err != nil {
-	// 	helpers.ServerError(w, err)
-	// }
+	stringMap["start_date"] = sd
+	stringMap["end_date"] = ed
 
 	// roomID, err := strconv.Atoi(r.Form.Get("room_id"))
 	// if err != nil {
@@ -191,11 +186,12 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 
 		data["reservation"] = reservation
 
-		http.Error(w, "my own error Message", http.StatusSeeOther)
+		// http.Error(w, "my own error Message", http.StatusSeeOther)
 
 		render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
-			Form: form,
-			Data: data,
+			Form:      form,
+			Data:      data,
+			StringMap: stringMap,
 		})
 
 		return
@@ -530,7 +526,7 @@ func (m *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
 	id, _, err := m.DB.Authenticate(email, password)
 
 	if err != nil {
-		log.Println(err)
+		// log.Println("aqui", err)
 		m.App.Session.Put(r.Context(), "error", "Invalid Login Credentials")
 		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 		return

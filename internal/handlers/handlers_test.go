@@ -424,6 +424,13 @@ var loginTest = []struct {
 		"",
 		"/user/login",
 	},
+	{
+		"invalid-data",
+		"j",
+		http.StatusOK,
+		`action="/user/login"`,
+		"",
+	},
 }
 
 func TestLogin(t *testing.T) {
@@ -462,6 +469,9 @@ func TestLogin(t *testing.T) {
 		if e.expectedHTML != "" {
 			//read the response body into a string
 			html := rr.Body.String()
+			fmt.Println("Esperaba===>", e.expectedHTML)
+			fmt.Println("Lleva===>", rr)
+
 			if !strings.Contains(html, e.expectedHTML) {
 				t.Errorf("failed %s: expected to find %s but did not", e.name, e.expectedHTML)
 			}
