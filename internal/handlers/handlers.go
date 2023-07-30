@@ -297,7 +297,12 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Print("Antes del SearchAvailabilityForAllRooms")
+
 	rooms, err := m.DB.SearchAvailabilityForAllRooms(startDate, endDate)
+
+	log.Print("Despues del SearchAvailabilityForAllRooms")
+	log.Print(rooms)
 
 	if err != nil {
 		helpers.ServerError(w, err)
