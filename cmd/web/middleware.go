@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 
-	"github.com/beginoffile/bookings/internal/helpers"
 	"github.com/justinas/nosurf"
 )
 
@@ -31,6 +30,7 @@ func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
 }
 
+/*
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !helpers.IsAuthenticated(r) || true {
@@ -39,5 +39,16 @@ func Auth(next http.Handler) http.Handler {
 			return
 		}
 		next.ServeHTTP(w, r)
+	})
+}
+
+*/
+
+func Auth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		session.Put(r.Context(), "error", "Login in first!")
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+
 	})
 }
