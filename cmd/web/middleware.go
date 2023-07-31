@@ -33,7 +33,7 @@ func SessionLoad(next http.Handler) http.Handler {
 
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !helpers.IsAuthenticated(r) || 1 == 1 {
+		if !helpers.IsAuthenticated(r) || true {
 			session.Put(r.Context(), "error", "Login in first!")
 			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 			return
