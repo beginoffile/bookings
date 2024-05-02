@@ -7,3 +7,4 @@ run.bat
 *.code-workspace
 database.yml
 /postgres-data
+docker-compose.yml
